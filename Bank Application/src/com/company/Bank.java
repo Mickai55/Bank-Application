@@ -33,9 +33,9 @@ class sortName implements Comparator<Client> {
 public class Bank {
 
     private String name;
-    private int balance; // lei, euro????
-    static int numberOfClients = 0;//private?
-    public List<Client> clients = new ArrayList<Client>(); // private!!
+    private int balance;
+    public static int numberOfClients = 0;
+    public List<Client> clients = new ArrayList<Client>();
 
     public Bank() { }
 
