@@ -6,7 +6,7 @@ public class Savings extends Client {
 
     public Savings() { }
 
-    public Savings(Person person, String cardCode, String PIN, int balance, String currency, Bank bank){
+    public Savings(Person person, String cardCode, String PIN, double balance, String currency, Bank bank){
         super(person, cardCode, PIN, balance, currency, bank);
         this.savings = 0;
     }

@@ -33,22 +33,26 @@ class sortName implements Comparator<Client> {
 public class Bank {
 
     private String name;
-    private int balance;
-    public static int numberOfClients = 0;
-    public List<Client> clients = new ArrayList<Client>();
+    private double balance; // lei, euro????
+    public int indexOf; // lei, euro????
+    private static int index;
+    static int numberOfClients = 0;//private?
+    public List<Client> clients = new ArrayList<>(); // private!!
 
     public Bank() { }
 
-    public Bank(String name, int balance) {
+    public Bank(String name, double balance) {
         this.name = name;
         this.balance = balance;
+        this.indexOf = index;
+        index++;
     }
 
-    public int getBankBalance() {
+    public double getBankBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 

@@ -4,7 +4,7 @@ public class Credit extends Client {
 
     public Credit() { }
 
-    public Credit(Person person, String cardCode, String PIN, int balance, String currency, Bank bank){
+    public Credit(Person person, String cardCode, String PIN, double balance, String currency, Bank bank){
         super(person, cardCode, PIN, balance, currency, bank);
     }
 
@@ -26,15 +26,19 @@ public class Credit extends Client {
                 "} (Credit)";
     }
 
-    public void withdraw(int x) {
-        if (x <= 200)
+    public boolean withdraw(int x) {
+        if (x <= 200) {
             this.balance -= x;
-        else
+        }
+        else{
             System.out.println("(" + this.name() + ") " + "You are not allowed to withdraw more than 200 in one go.");
+            return false;
+        }
 
         if (this.balance < 0)
             System.out.println("(" + this.name() + ") " + "You have negative balance!." + "(" + this.balance + ")");
 
+        return true;
     }
 
 }

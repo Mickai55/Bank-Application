@@ -1,28 +1,29 @@
 package com.company;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Management{
 
+    ServiceCSV service = ServiceCSV.getInstance();
+    public static List<Bank> banks = new ArrayList<>(); // private!!
+
     public void manage() {
 
-        Bank bank1 = new Bank("BRD", 999999);
-        Person p;
+        service.readBanks();
+        service.readCients();
 
-        Credit c1 = new Credit(p = new Person("Costel", "Ion", "Male"), "22222222", "1235", 100, "Lei", bank1);
-        Savings c2 = new Savings(p = new Person("Voica", "Mihai", "Male"), "11111111", "1234", 10, "Lei", bank1);
-        Premium c3 = new Premium(p = new Person("Ionescu", "Andrei", "Male"), "33333333", "1223", 200, "Lei", bank1);
-
-        Login(bank1);
-
+        Menu(banks.get(0));
     }
 
-    public void Login(Bank bank)
+    public void Menu(Bank bank)
     {
         Scanner scan = new Scanner(System.in);
         int choice1 = 0;
 
         outerloop:
         while (true) {
+            System.out.println("Bank: " +  bank.getName());
             System.out.println("Choose:");
             System.out.println("1 -> Login.");
             System.out.println("2 -> Create a new account.");
@@ -53,6 +54,7 @@ public class Management{
                         default: {
                             int choice2 = 0;
                             System.out.println("\nLogin successful!");
+                            service.writeTimestamp(bank.clients.get(r).name() + " logged in");
                             System.out.println("Welcome " + bank.clients.get(r).name() + "! (" + bank.clients.get(r).getClass().getSimpleName() + ")");
 
                             outerloop2:
@@ -74,6 +76,7 @@ public class Management{
                                     // Display balance
                                     case 1: {
                                         bank.clients.get(r).displayBalance();
+                                        service.writeTimestamp(bank.clients.get(r).name() + " displayed balance");
                                         break;
                                     }
 
@@ -81,7 +84,12 @@ public class Management{
                                     case 2: {
                                         System.out.println("Sum to withdraw: ");
                                         int s = scan.nextInt();
-                                        bank.clients.get(r).withdraw(s);
+                                        if (bank.clients.get(r).withdraw(s)) {
+                                            service.writeTimestamp(bank.clients.get(r).name() + " withdrawed " + s + " " + bank.clients.get(r).currency);
+                                            service.replace("clients.csv", bank.clients.get(r).cardCode, String.valueOf(bank.clients.get(r).balance), "Balance");
+                                        }
+                                        else
+                                            service.writeTimestamp(bank.clients.get(r).name() + " failed to withdraw " + s + " " + bank.clients.get(r).currency);
                                         break;
                                     }
 
@@ -90,6 +98,8 @@ public class Management{
                                         System.out.println("Sum to add: ");
                                         int s = scan.nextInt();
                                         bank.clients.get(r).addBalance(s);
+                                        service.writeTimestamp(bank.clients.get(r).name() + " added " + s + " " + bank.clients.get(r).currency);
+                                        service.replace("clients.csv", bank.clients.get(r).cardCode, String.valueOf(bank.clients.get(r).balance), "Balance");
                                         break;
                                     }
 
@@ -97,7 +107,12 @@ public class Management{
                                     case 4: {
                                         System.out.println("Sum to loan: ");
                                         int s = scan.nextInt();
-                                        bank.clients.get(r).loan(s, bank);
+                                        if (bank.clients.get(r).loan(s, bank)) {
+                                            service.writeTimestamp(bank.clients.get(r).name() + " loaned " + s + " " + bank.clients.get(r).currency);
+                                            service.replace("clients.csv", bank.clients.get(r).cardCode, String.valueOf(bank.clients.get(r).balance), "Balance");
+                                        }
+                                        else
+                                            service.writeTimestamp(bank.clients.get(r).name() + " failed to loan " + s + " " + bank.clients.get(r).currency);
                                         break;
                                     }
 
@@ -112,7 +127,16 @@ public class Management{
                                         else {
                                             System.out.println("Sum to send: ");
                                             int S = scan.nextInt();
-                                            bank.clients.get(r).sendMoney(bank.clients.get(n), S);
+                                            if (bank.clients.get(r).sendMoney(bank.clients.get(n), S)) {
+                                                service.writeTimestamp(bank.clients.get(r).name() + " sent " + S + " " + bank.clients.get(r).currency +
+                                                        " to " + bank.clients.get(n).name());
+
+                                                service.replace("clients.csv", bank.clients.get(r).cardCode, String.valueOf(bank.clients.get(r).balance), "Balance");
+                                                service.replace("clients.csv", bank.clients.get(n).cardCode, String.valueOf(bank.clients.get(n).balance), "Balance");
+                                            }
+                                            else
+                                                service.writeTimestamp(bank.clients.get(r).name() + " failed to send " + S + " " + bank.clients.get(r).currency +
+                                                        " to " + bank.clients.get(n).name());
 
                                             System.out.println("Success!");
                                         }
@@ -134,19 +158,29 @@ public class Management{
 
                                         switch (choice3) {
                                             case 1:
+                                                service.writeTimestamp(bank.clients.get(r).name() + " converted to Premium");
+                                                service.replace("clients.csv", bank.clients.get(r).cardCode, "Premium", "Type");
                                                 bank.convertToPremium(bank.clients.get(r));
                                                 break;
                                             case 2:
                                                 bank.convertToCredit(bank.clients.get(r));
+                                                service.writeTimestamp(bank.clients.get(r).name() + " converted to Credit");
+                                                service.replace("clients.csv", bank.clients.get(r).cardCode, "Credit", "Type");
                                                 break;
                                             case 3:
                                                 bank.convertToSavings(bank.clients.get(r));
+                                                service.writeTimestamp(bank.clients.get(r).name() + " converted to Savings");
+                                                service.replace("clients.csv", bank.clients.get(r).cardCode, "Savings", "Type");
                                                 break;
                                             case 4:
                                                 bank.convertToRevolving(bank.clients.get(r));
+                                                service.writeTimestamp(bank.clients.get(r).name() + " converted to Revolving");
+                                                service.replace("clients.csv", bank.clients.get(r).cardCode, "Revolving", "Type");
                                                 break;
                                             case 5:
                                                 bank.convertToInstallment(bank.clients.get(r));
+                                                service.writeTimestamp(bank.clients.get(r).name() + " converted to Installment");
+                                                service.replace("clients.csv", bank.clients.get(r).cardCode, "Installment", "Type");
                                                 break;
                                             default:
                                                 throw new IllegalStateException("Unexpected value: " + choice3);
@@ -161,8 +195,10 @@ public class Management{
                                         System.out.println("Are you sure? (y/n)");
                                         String s = scan.nextLine();
                                         if (s.equals("y")) {
+                                            service.writeTimestamp(bank.clients.get(r).name() + " deleted account");
                                             System.out.println(bank.clients.get(r).name() + " deleted!");
                                             bank.removeClientByNo(r);
+                                            service.replace("clients.csv", bank.clients.get(r).cardCode, "???", "Delete");
                                         }
                                         break;
                                     }
@@ -190,7 +226,6 @@ public class Management{
                     String cardCode = bank.generateCode();
                     System.out.print("Pin:");
                     String pin = scan.nextLine();
-                    Person p = new Person(firstName, lastName, sex);
 
                     System.out.println("Choose the type of your account:");
                     System.out.println("1 -> Client");
@@ -206,29 +241,32 @@ public class Management{
 
                     switch (choice4) {
                         case 1:
-                            c = new Client(p, cardCode, pin, 0, "Lei", bank);
+                            c = new Client(new Person(lastName, firstName, sex), cardCode, pin, 0, "Lei", bank);
                             break;
                         case 2:
-                            c = new Premium(p, cardCode, pin, 0, "Lei", bank);
+                            c = new Premium(new Person(lastName, firstName, sex), cardCode, pin, 0, "Lei", bank);
                             break;
                         case 3:
-                            c = new Credit(p, cardCode, pin, 0, "Lei", bank);
+                            c = new Credit(new Person(lastName, firstName, sex), cardCode, pin, 0, "Lei", bank);
                             break;
                         case 4:
-                            c = new Savings(p, cardCode, pin, 0, "Lei", bank);
+                            c = new Savings(new Person(lastName, firstName, sex), cardCode, pin, 0, "Lei", bank);
                             break;
                         case 5:
-                            c = new Revolving(p, cardCode, pin, 0, "Lei", bank);
+                            c = new Revolving(new Person(lastName, firstName, sex), cardCode, pin, 0, "Lei", bank);
                             break;
                         case 6:
-                            c = new Installment(p, cardCode, pin, 0, "Lei", bank);
+                            c = new Installment(new Person(lastName, firstName, sex), cardCode, pin, 0, "Lei", bank);
                             break;
                         default:
                             throw new IllegalStateException("Unexpected value: " + choice4);
                     }
 
+                    // daca nu este utilizat deja numele???
+                    service.writeFile(lastName + "," + firstName + "," + sex + "," + cardCode + "," + pin + "," + 0 + "," + "Lei" + "," + bank.indexOf + "," + c.getClass().getSimpleName(), "clients.csv");
 
-                    System.out.println("Hello, " + firstName + " " + lastName + "! (" + c.getClass().getSimpleName() + "). " + "Your unique card code is: " + cardCode + ".");
+                    service.writeTimestamp(lastName + firstName + " created a new account");
+                    System.out.println("Hello, " + lastName + " " + firstName + "! (" + c.getClass().getSimpleName() + "). " + "Your unique card code is: " + cardCode + ".");
                     System.out.println("Now you can login!");
                     break;
                 }

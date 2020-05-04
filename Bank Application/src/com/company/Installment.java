@@ -4,7 +4,7 @@ public class Installment extends Client {
 
     public Installment() { }
 
-    public Installment(Person person, String cardCode, String PIN, int balance, String currency, Bank bank){
+    public Installment(Person person, String cardCode, String PIN, double balance, String currency, Bank bank){
         super(person, cardCode, PIN, balance, currency, bank);
     }
 
@@ -26,12 +26,14 @@ public class Installment extends Client {
                 "} (Credit)";
     }
 
-    public void sendMoney(Client client, double sum) {
+    public boolean sendMoney(Client client, double sum) {
         if (this.getBalance() - sum >= 0) {
             this.setBalance(this.getBalance() - sum);
-            client.setBalance(client.getBalance() + sum + 1.25 * sum);
+            client.setBalance(client.getBalance() + 1.05 * sum);
+            return true;
         }
         else
             System.out.println("You don't have the requested sum disposable! (" + this.name() + ", " + sum + ").");
+        return false;
     }
 }
