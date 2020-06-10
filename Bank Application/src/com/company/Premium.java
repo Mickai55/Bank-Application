@@ -15,7 +15,6 @@ public class Premium extends Client {
         this.balance = x.balance;
         this.currency = x.currency;
         this.no = x.no;
-        //bank??
     }
 
     @Override

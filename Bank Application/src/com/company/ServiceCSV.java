@@ -1,6 +1,5 @@
 package com.company;
 
-import javax.swing.*;
 import java.io.*;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -127,26 +126,28 @@ public class ServiceCSV {
             while (inputStream.hasNext()) {
                 String line = inputStream.next();
                 String[] words = line.split(",");
-                if (whatToChange == "Balance") {
-                    if (words[3].equals(code)) {
-                        String newLine = words[0] + "," + words[1] + "," + words[2] + "," + words[3] + "," + words[4] + "," + newVal + "," + words[6] + "," + words[7] + "," + words[8];
-                        writeFile(newLine, "myTempFile.csv");
-                    } else {
-                        writeFile(line, "myTempFile.csv");
-                    }
-                }
-                else if (whatToChange == "Type"){
-                    if (words[3].equals(code)) {
-                        String newLine = words[0] + "," + words[1] + "," + words[2] + "," + words[3] + "," + words[4] + "," + words[5] + "," + words[6] + "," + words[7] + "," + newVal;
-                        writeFile(newLine, "myTempFile.csv");
-                    } else {
-                        writeFile(line, "myTempFile.csv");
-                    }
-                }
-                else if (whatToChange == "Delete"){
-                    if (!words[3].equals(code)) {
-                        writeFile(line, "myTempFile.csv");
-                    }
+                switch (whatToChange) {
+                    case "Balance":
+                        if (words[3].equals(code)) {
+                            String newLine = words[0] + "," + words[1] + "," + words[2] + "," + words[3] + "," + words[4] + "," + newVal + "," + words[6] + "," + words[7] + "," + words[8];
+                            writeFile(newLine, "myTempFile.csv");
+                        } else {
+                            writeFile(line, "myTempFile.csv");
+                        }
+                        break;
+                    case "Type":
+                        if (words[3].equals(code)) {
+                            String newLine = words[0] + "," + words[1] + "," + words[2] + "," + words[3] + "," + words[4] + "," + words[5] + "," + words[6] + "," + words[7] + "," + newVal;
+                            writeFile(newLine, "myTempFile.csv");
+                        } else {
+                            writeFile(line, "myTempFile.csv");
+                        }
+                        break;
+                    case "Delete":
+                        if (!words[3].equals(code)) {
+                            writeFile(line, "myTempFile.csv");
+                        }
+                        break;
                 }
             }
             inputStream.close();
